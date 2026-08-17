@@ -1,24 +1,15 @@
-// File: api/search.js
 export default async function handler(req, res) {
-  // Izinkan akses CORS
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
-  if (req.method === 'OPTIONS') {
-    return res.status(200).end();
-  }
-
-  if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method not allowed' });
-  }
+  if (req.method === 'OPTIONS') return res.status(200).end();
+  if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
   const { query } = req.body;
   const apiKey = process.env.GEMINI_API_KEY;
 
-  if (!query) {
-    return res.status(400).json({ error: 'Judul lagu wajib diisi.' });
-  }
+  if (!query) return res.status(400).json({ error: 'Judul lagu wajib diisi.' });
 
   const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
 
@@ -55,7 +46,7 @@ export default async function handler(req, res) {
     const data = await response.json();
     const rawText = data.candidates?.[0]?.content?.parts?.[0]?.text;
 
-    if (!rawText) throw new Error("Gagal mengambil data dari Gemini.");
+    if (!rawText) throw new Error("Gagal memproses data dari AI.");
 
     return res.status(200).json(JSON.parse(rawText));
   } catch (err) {
